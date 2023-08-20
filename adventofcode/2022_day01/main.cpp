@@ -26,6 +26,7 @@ void print_cpp_version() {
 string input();
 
 int main() {
+    cout << __clang__ << endl;
     print_cpp_version();
 
     string str;
