@@ -27,7 +27,8 @@ vector<int> find_delimiter(string str, string delimiter)
     return v;
 }
 
-void print_vec_vec(vector<vector<char>> &vec)
+template <typename T>
+void print_vec_vec(vector<vector<T>> &vec)
 {
     for (int i = 0; i < vec.size(); i++)
     {
@@ -35,31 +36,6 @@ void print_vec_vec(vector<vector<char>> &vec)
             cout << vec[i][j] << " ";
         cout << endl;
     }
-    cout << endl;
-}
-
-void print_vec_vec2(vector<vector<int>> &vec)
-{
-    for (int i = 0; i < vec.size(); i++)
-    {
-        for (int j = 0; j < vec[i].size(); j++)
-            cout << vec[i][j] << " ";
-        cout << endl;
-    }
-    cout << endl;
-}
-
-void print_vec(vector<int> &v)
-{
-    for (int r : v)
-        cout << r << " ";
-    cout << endl;
-}
-
-void print_vec2(vector<char> &v)
-{
-    for (int r : v)
-        cout << r << " ";
     cout << endl;
 }
 
@@ -123,8 +99,8 @@ int main()
         stacks_rev_vec.push_back(rv);
     }
 
-    print_vec_vec(stacks_rev_vec);
-    print_vec_vec2(commands_vec);
+    print_vec_vec<char>(stacks_rev_vec);
+    print_vec_vec<int>(commands_vec);
 
     for (auto v : commands_vec)
     {
