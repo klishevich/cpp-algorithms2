@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <tuple>
+#include <deque>
 
 using namespace std;
 
@@ -28,12 +29,11 @@ vector<int> find_delimiter(string str, string delimiter)
 }
 
 template <typename T>
-void print_vec_vec(vector<vector<T>> &vec)
+void print_vec(vector<T> &vec)
 {
-    for (int i = 0; i < vec.size(); i++)
-    {
-        for (int j = 0; j < vec[i].size(); j++)
-            cout << vec[i][j] << " ";
+    for (auto v : vec) {
+        for (auto c : v)
+            cout << c << " ";
         cout << endl;
     }
     cout << endl;
@@ -47,7 +47,6 @@ int char_to_num(char c)
 tuple<int, int> get_number_of_colums()
 {
     string str;
-    int res = 0;
     int ii = 0;
     for (stringstream file(input()); getline(file, str); ii++)
         if (str[1] == '1')
@@ -57,12 +56,11 @@ tuple<int, int> get_number_of_colums()
 
 int main()
 {
+    bool is_part_1 = true;
     int numbers_line_index;
     int stacks_cnt;
     tie(numbers_line_index, stacks_cnt) = get_number_of_colums();
-    vector<vector<char>> stacks_vec(stacks_cnt);
-    vector<vector<char>> stacks_rev_vec;
-    vector<vector<int>> commands_vec;
+    vector<deque<char>> stacks_vec(stacks_cnt);
 
     int i = 0;
     string str;
@@ -77,7 +75,7 @@ int main()
                     break;
                 char c = str[char_index];
                 if (c != 32)
-                    stacks_vec[j].push_back(c);
+                    stacks_vec[j].push_front(c);
             }
         }
         else if (i > numbers_line_index + 1)
@@ -86,44 +84,30 @@ int main()
             int moves = stoi(str.substr(d_vec[0] + 1, d_vec[1]));
             int from = char_to_num(str[d_vec[2] + 1]) - 1;
             int to = char_to_num(str[d_vec[4] + 1]) - 1;
-            commands_vec.push_back({moves, from, to});
+            deque<char> *from_deque_ref = &stacks_vec[from];
+            deque<char> *to_deque_ref = &stacks_vec[to];
+            deque<char> tmp_deque;
+            for (int ii = 0; ii < moves; ii++)
+            {
+                char ch = from_deque_ref->back();
+                from_deque_ref->pop_back();
+                if (is_part_1) {
+                    tmp_deque.push_back(ch);
+                } else {
+                    tmp_deque.push_front(ch);
+                }
+            }
+            for (char c : tmp_deque) {
+                to_deque_ref->push_back(c);
+            }
         }
     }
 
-    for (i = 0; i < stacks_vec.size(); i++)
-    {
-        vector<char> v = stacks_vec[i];
-        vector<char> rv;
-        for (int j = v.size() - 1; j >= 0; j--)
-            rv.push_back(v[j]);
-        stacks_rev_vec.push_back(rv);
-    }
+    print_vec<deque<char>>(stacks_vec);
 
-    print_vec_vec<char>(stacks_rev_vec);
-    print_vec_vec<int>(commands_vec);
+    for (auto e : stacks_vec)
+        cout << e.back();
 
-    for (auto v : commands_vec)
-    {
-        int moves = v[0];
-        int from = v[1];
-        vector<char> *from_vec_ref = &stacks_rev_vec[from];
-        int to = v[2];
-        vector<char> *to_vec_ref = &stacks_rev_vec[to];
-        for (int ii = 0; ii < moves; ii++)
-        {
-            char ch = from_vec_ref->back();
-            from_vec_ref->pop_back();
-            to_vec_ref->push_back(ch);
-        }
-    }
-
-    print_vec_vec(stacks_rev_vec);
-    string res;
-    for (auto e : stacks_rev_vec)
-    {
-        res.push_back(e.back());
-    }
-    cout << "res " << res << endl;
     return 0;
 }
 
