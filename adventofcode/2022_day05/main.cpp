@@ -74,7 +74,7 @@ int main()
                 if (char_index >= str.length())
                     break;
                 char c = str[char_index];
-                if (c != 32)
+                if (c != ' ')
                     stacks_vec[j].push_front(c);
             }
         }
