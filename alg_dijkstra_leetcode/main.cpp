@@ -4,12 +4,54 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <map>
 
 using namespace std;
 
 int SIZE = 9;
 
 string input();
+
+class Graph {
+private:
+    map<int, map<int, int>> g;
+    set<int> visited;
+    map<int, int> dist;
+public:
+    Graph(int n, vector<vector<int>>& edges) {
+        for (int i=0; i<edges.size(); ++i) {
+            this->addEdge(edges[i]);
+        } 
+    }
+    
+    void addEdge(vector<int> edge) {
+        int from = edge[0];
+        int to = edge[1];
+        int cost = edge[2];
+        if (g.find(from) == g.end()) {
+            g.insert({from, map<int, int>() });
+        }
+        g.find(from)->second.insert({to, cost});
+    }
+    
+    int shortestPath(int node1, int node2) {
+        // TODO
+    }
+
+    void print() {
+        for (const auto &[k, v] : g) {
+            cout << k << "=>" << endl;
+            for (const auto &[k1, v1] : v)
+                cout << " " << k1 << ":" << v1 << endl;
+        }
+        // for (auto v : g) {
+        //     for (auto c : v)
+        //         cout << c << " ";
+        //     cout << endl;
+        // }
+        // cout << endl;
+    }
+};
 
 class Vertex {
 public:
@@ -43,7 +85,7 @@ void print_vec(vector<T> &vec)
     cout << endl;
 }
 
-vector<vector<int>> read_graph()
+vector<vector<int>> read_edges()
 {
     vector<vector<int>> graph;
     string str;
@@ -87,60 +129,22 @@ void print_queue(priority_queue<Vertex> q) {
 int main()
 {
     // input
-    vector<vector<int>> graph = read_graph();
-    print_vec<vector<int>>(graph);
+    vector<vector<int>> edges = read_edges();
+    print_vec<vector<int>>(edges);
 
-    set<int> visited;
-    priority_queue<Vertex> vertices_queue;
+    Graph* obj = new Graph(4, edges);
+    obj->print();
 
-    // output
-    vector<int> dist(SIZE, INT_MAX);
-
-    // start from vertex 0
-    vertices_queue.push(Vertex(0, 0));
-    dist[0] = 0;
-
-    do {
-        print_visited(visited);
-        print_queue(vertices_queue);
-        Vertex u = vertices_queue.top();
-        vertices_queue.pop();
-
-        if (visited.count(u.id)) continue;
-
-        visited.insert(u.id);
-        int u_dist = dist[u.id];
-        for (int v_id=0; v_id<SIZE; ++v_id) {
-            bool u_v_has_route = graph[u.id][v_id] > 0;
-            if (!visited.count(v_id) && u_v_has_route) {
-                int v_cur_dist = dist[v_id];
-                int u_v_dist = graph[u.id][v_id];
-                if (v_cur_dist == INT_MAX || v_cur_dist > u_dist + u_v_dist) {
-                    dist[v_id] = u_dist + u_v_dist;
-                    vertices_queue.push(Vertex(v_id, dist[v_id]));
-                }
-            }
-        }
-
-    } while (visited.size() < SIZE || vertices_queue.size() > 0);
-
-    for (auto c : dist)
-        cout << c << " ";
-    cout << endl;
+    int param_2 = obj->shortestPath(3,2);
     return 0;
 }
 
 string input()
 {
     return R"(
-0 4 0 0 0 0 0 8 0
-4 0 8 0 0 0 0 11 0
-0 8 0 7 0 4 0 0 2
-0 0 7 0 9 14 0 0 0
-0 0 0 9 0 10 0 0 0
-0 0 4 14 10 0 2 0 0
-0 0 0 0 0 2 0 1 6
-8 11 0 0 0 0 1 0 7
-0 0 2 0 0 0 6 7 0
+0 2 5
+0 1 2
+1 2 1
+3 0 3
 )";
 }
