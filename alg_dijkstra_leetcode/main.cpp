@@ -5,11 +5,8 @@
 #include <set>
 #include <queue>
 #include <map>
-#include <limits.h>
 
 using namespace std;
-
-int SIZE = 9;
 
 string input();
 
