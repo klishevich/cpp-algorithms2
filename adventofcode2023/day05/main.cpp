@@ -119,18 +119,15 @@ int main()
         line_idx++;
     }
 
-    for (vector<long> seed : seeds) {
-        vector<vector<long>> r { seed };
-        for (vector<vector<long>>& cm : all_maps) {
-            // print_vec("r", r);
-            // print_vec("cm", cm);
-            r = process_map(cm, r);
-        }
-        for (vector<long> rr : r) {
-            cout << "min " << rr[0] << " max " << rr[1] << endl;
-            if (rr[0] < res) {
-                res = rr[0];
-            }
+    vector<vector<long>> r = seeds;
+    for (vector<vector<long>>& cm : all_maps) {
+        // print_vec("cm", cm);
+        r = process_map(cm, r);
+    }
+    for (vector<long> rr : r) {
+        // cout << "min " << rr[0] << " max " << rr[1] << endl;
+        if (rr[0] < res) {
+            res = rr[0];
         }
     }
     
