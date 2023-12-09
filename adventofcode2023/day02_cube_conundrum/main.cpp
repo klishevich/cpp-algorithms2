@@ -45,6 +45,8 @@ vector<vector<int>> parse_game(string& s) {
     string last_ss = s.substr(start+1);
     sss.push_back(last_ss);
 
+    for (auto d:sss) cout << d << " ";
+        cout << endl;
     for (string& ss : sss) {
         int r = 0;
         int g = 0;

@@ -120,12 +120,13 @@ int main()
     }
 
     vector<vector<long>> r = seeds;
+    print_vec("r", r);
     for (vector<vector<long>>& cm : all_maps) {
-        // print_vec("cm", cm);
+        print_vec("cm", cm);
         r = process_map(cm, r);
     }
     for (vector<long> rr : r) {
-        // cout << "min " << rr[0] << " max " << rr[1] << endl;
+        cout << "min " << rr[0] << " max " << rr[1] << endl;
         if (rr[0] < res) {
             res = rr[0];
         }
