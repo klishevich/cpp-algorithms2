@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -39,11 +40,11 @@ public:
         vector<int> num_vec2;
         this->fillVectors(m2, char_vec2, num_vec2);
         if (char_vec1.size() != char_vec2.size()) return false;
-        for (int i=0; i<char_vec1.size(); ++i) {
+        for (size_t i=0; i<char_vec1.size(); ++i) {
             if (char_vec1[i] != char_vec2[i]) return false;
         }
         if (num_vec1.size() != num_vec2.size()) return false;
-        for (int i=0; i<num_vec1.size(); ++i) {
+        for (size_t i=0; i<num_vec1.size(); ++i) {
             if (num_vec1[i] != num_vec2[i]) return false;
         }
         return true;
