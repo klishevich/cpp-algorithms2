@@ -6,24 +6,35 @@
 
 using namespace std;
 
-class Solution {
+class Solution
+{
 private:
     map<int, int> cache;
 
 public:
-    int cnt {0};
-    int cnt2 {0};
+    int cnt{0};
+    int cnt2{0};
 
-    int findInMountainArray(int target, vector<int> &mountainArr) {
+    int findInMountainArray(int target, vector<int> &mountainArr)
+    {
         int size = mountainArr.size();
-        return this->findRes(target, 0, size-1, mountainArr, 0);
+        int topIndex = this->findTop(0, size - 1, mountainArr);
+        cout << "top index " << topIndex << endl;
+        int leftRes = this->findRes(target, 0, topIndex, mountainArr, true);
+        if (leftRes != -1)
+            return leftRes;
+        return this->findRes(target, topIndex, size - 1, mountainArr, false);
     }
 
-    int get(int i, vector<int> &m) {
+    int get(int i, vector<int> &m)
+    {
         this->cnt2++;
-        if (cache.find(i) != cache.end()) {
+        if (cache.find(i) != cache.end())
+        {
             return cache.at(i);
-        } else {
+        }
+        else
+        {
             int res = m.at(i);
             this->cnt++;
             cache.insert({i, res});
@@ -31,32 +42,43 @@ public:
         }
     }
 
-    // dataShape -1 desc, 0 mountain, 1 asc
-    int findRes(int target, int leftIndex, int rightIndex, vector<int> &m, int dataShape) {
-        if (rightIndex - leftIndex < 2) {
-            if (this->get(leftIndex, m) == target) return leftIndex;
-            if (this->get(rightIndex, m) == target) return rightIndex;
+    int findTop(int leftIndex, int rightIndex, vector<int> &m)
+    {
+        if (rightIndex - leftIndex < 2)
+        {
+            if (this->get(leftIndex, m) > this->get(rightIndex, m))
+                return leftIndex;
+            return rightIndex;
+        }
+        int centerIndex = leftIndex + (rightIndex - leftIndex) / 2;
+        int centerValue = this->get(centerIndex, m);
+        int leftCenterValue = this->get(centerIndex - 1, m);
+        if (leftCenterValue < centerValue)
+            return this->findTop(centerIndex, rightIndex, m);
+        return this->findTop(leftIndex, centerIndex, m);
+    }
+
+    int findRes(int target, int leftIndex, int rightIndex, vector<int> &m, bool isAsc)
+    {
+        if (rightIndex - leftIndex < 2)
+        {
+            if (this->get(leftIndex, m) == target)
+                return leftIndex;
+            if (this->get(rightIndex, m) == target)
+                return rightIndex;
             return -1;
         }
         int centerIndex = leftIndex + (rightIndex - leftIndex) / 2;
         int value = this->get(centerIndex, m);
-        int leftValue = this->get(centerIndex-1, m);
-        if (value == target && leftValue < target)
+        if (value == target)
             return centerIndex;
-
-        bool isMountain = dataShape == 0;
-        if (isMountain) {
-            bool isAscending = value > leftValue;
-            int leftRes = this->findRes(target, leftIndex, centerIndex, m, isAscending ? 1 : 0);
-            if (leftRes != -1)
-                return leftRes;
-            return this->findRes(target, centerIndex, rightIndex, m, isAscending ? 0 : -1);
-        } else {
-            bool isAscending = dataShape == 1;
-            if ((isAscending && value < target) || (!isAscending && value > target))
-                return this->findRes(target, centerIndex, rightIndex, m, dataShape);
-            else
-                return this->findRes(target, leftIndex, centerIndex, m, dataShape);
+        if ((value < target && isAsc) || value > target && !isAsc)
+        {
+            return this->findRes(target, centerIndex + 1, rightIndex, m, isAsc);
+        }
+        else
+        {
+            return this->findRes(target, leftIndex, centerIndex - 1, m, isAsc);
         }
     }
 };
@@ -65,7 +87,7 @@ int main()
 {
     Solution *s = new Solution();
 
-    // vector<int> vec{1,2,3,4,5,3,1};
+    // vector<int> vec{1, 2, 3, 4, 5, 3, 1};
     // int target = 3; // output 2
 
     // vector<int> vec{0,1,2,4,2,1};
