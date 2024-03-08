@@ -50,7 +50,7 @@ int main()
 {
     Solution *s = new Solution();
 
-    vector<vector<int>> vec{{2, 1, 3},
+    vector<vector<int>> vec{{2, 1, 3}, 
                             {6, 5, 4},
                             {7, 8, 9}};
     int res = s->minFallingPathSum(vec); // 13
