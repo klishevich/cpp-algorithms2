@@ -18,7 +18,7 @@ public:
 
     vector<vector<int>> fill_matrix(int row, int col, vector<vector<int>> &vec, int day)
     {
-        auto data = std::vector(row, std::vector(col, 0));
+        vector<vector<int>> data = vector<vector<int>>(row, vector<int>(col, 0));
         for (int k = 0; k < day; k++)
         {
             vector<int> a = vec[k];
