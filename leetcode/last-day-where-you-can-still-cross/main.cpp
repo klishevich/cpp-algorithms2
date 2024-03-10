@@ -10,28 +10,22 @@
 using namespace std;
 
 // Hash function
-struct hf
-{
-    size_t operator()(const pair<int, int> &x) const
-    {
+struct hf {
+    size_t operator()(const pair<int, int> &x) const {
         return 10000 * x.first + x.second;
     }
 };
 
-class Solution
-{
+class Solution {
 public:
-    int latestDayToCross(int row, int col, vector<vector<int>> &cells)
-    {
+    int latestDayToCross(int row, int col, vector<vector<int>> &cells) {
         int k_left = 0;
         int k_right = cells.size() - 1;
-        unordered_set<pair<int, int>, hf> land_cells;
-        vector<pair<int, int>> stack;
-        unordered_set<pair<int, int>, hf> visited;
         do {
             int k = k_left + (k_right - k_left) / 2;
+            unordered_set<pair<int, int>, hf> land_cells;
             this->fill_land_cells(row, col, cells, k + 1, land_cells);
-            if (has_route(row, col, land_cells, stack, visited)) {
+            if (has_route(row, col, land_cells)) {
                 k_left = k;
             } else {
                 k_right = k;
@@ -40,32 +34,26 @@ public:
         return k_left + 1;
     }
 
-    void fill_land_cells(int row, int col, const vector<vector<int>> &cells, int day, unordered_set<pair<int, int>, hf> &land_cells)
-    {
-        land_cells.clear();
-        for (int k = 0; k < day; k++)
-        {
+    void fill_land_cells(int row, int col, const vector<vector<int>> &cells, int day, unordered_set<pair<int, int>, hf> &land_cells) {
+        for (int k = 0; k < day; k++) {
             vector<int> a = cells[k];
             land_cells.insert(make_pair(a[0] - 1, a[1] - 1));
         }
     }
 
-    bool has_route(int row, int col, const unordered_set<pair<int, int>, hf> &land_cells, vector<pair<int, int>> &stack, unordered_set<pair<int, int>, hf> &visited)
+    bool has_route(int row, int col, const unordered_set<pair<int, int>, hf> &land_cells)
     {
-        stack.clear();
-        visited.clear();
-        for (int j = 0; j < col; j++)
-        {
+        vector<pair<int, int>> stack;
+        unordered_set<pair<int, int>, hf> visited;
+        for (int j = 0; j < col; j++) {
             pair<int, int> p = make_pair(0, j);
-            if (!land_cells.count(p))
-            {
+            if (!land_cells.count(p)) {
                 stack.push_back(p);
                 visited.insert(p);
             }
         }
         if (stack.size() == 0) return false;
-        do
-        {
+        do {
             pair<int, int> cur_element = stack.back();
             int i_cur = cur_element.first;
             int j_cur = cur_element.second;
