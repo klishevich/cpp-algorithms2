@@ -44,46 +44,27 @@ public:
             w_vec.push_back(w);
         }
         sort(w_vec.begin(), w_vec.end(), CompareAscWQ());
-        for (int i=0; i<w_vec.size(); i++) {
-            WorkerInfo cur = w_vec[i];
-            cout << "s: " << cur.index << " " << cur.quality << " " << cur.wage << " " << cur.wage_to_quality << endl;
-        }
 
         int quality_sum = 0;
-        double max_wq = 0.0;
         double total_wage = 0.0;
         priority_queue<WorkerInfo, vector<WorkerInfo>, CompareAscQuality> max_quality_queue;
 
         for (int i=0; i<w_vec.size(); i++) {
             WorkerInfo w = w_vec[i];
+            double max_wq = w.wage_to_quality;
             if (i < k) {
                 quality_sum += w.quality;
-                max_wq = w.wage_to_quality;
                 total_wage = (double)quality_sum * max_wq;
                 max_quality_queue.push(w);
             } else {
-                cout << "quality_sum: " << quality_sum << endl;
-                cout << "max_wq: " << max_wq << endl;
-                cout << "total_wage: " << total_wage << endl;
-                cout << "w: " << w.index << " " << w.quality << " " << w.wage << " " << w.wage_to_quality << endl;
                 WorkerInfo top_w = max_quality_queue.top();
-                cout << "top_w: " << top_w.index << " " << top_w.quality << " " << top_w.wage << " " << top_w.wage_to_quality << endl;
-                double new_max_wq = w.wage_to_quality;
-                cout << "new_max_wq: " << new_max_wq << endl;
-                int new_quality_sum = quality_sum - top_w.quality + w.quality;
-                cout << "new_quality_sum: " << new_quality_sum << endl;
-                double new_total_wage = (double)new_quality_sum * new_max_wq;
-                cout << "new_total_wage: " << new_total_wage << endl;
-                if (new_total_wage < total_wage) {
-                    quality_sum = new_quality_sum;
-                    max_wq = new_max_wq;
-                    total_wage = new_total_wage;
-                    max_quality_queue.pop();
-                    max_quality_queue.push(w);
-                }
+                quality_sum -= top_w.quality;
+                max_quality_queue.pop();
+
+                quality_sum += w.quality;
+                max_quality_queue.push(w);
+                total_wage = min(total_wage, max_wq * (double)quality_sum);
             }
-            WorkerInfo cur = max_quality_queue.top();
-            cout << "i: " << cur.index << " " << cur.quality << " " << cur.wage << " " << cur.wage_to_quality << endl;
         }
 
         return total_wage;
