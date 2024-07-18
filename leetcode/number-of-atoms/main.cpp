@@ -43,20 +43,12 @@ public:
     			int mult_int = mult == "" ? 1 : stoi(mult);
     			map<string,int> last_counter = counter_stack.back();
     			counter_stack.pop_back();
-    			myprint(&last_counter, "last_counter");
-    			cout << "mult_int: " << mult_int << endl;
     			map<string,int>* target_counter = counter_stack.size() > 0 ? &counter_stack.back() : &result_counter;
     			for (auto const &p : last_counter) {
     				int cur_cnt = target_counter->count(p.first) ? target_counter->at(p.first) : 0;
-    				cout << "p.first " << p.first << endl;
-    				// cout << "p.second " << p.second << endl;
-    				// cout << "cur_cnt " << cur_cnt << endl;
     				int rr = cur_cnt + p.second * mult_int;
-    				cout << "rr " << rr << endl;
-    				myprint(target_counter, "target_counter 1");
     				if (cur_cnt) target_counter->at(p.first) = rr;
     				else target_counter->insert({ p.first, rr });
-    				myprint(target_counter, "target_counter 2");
     			}
     		} else {
     			string cur_elem = "";
