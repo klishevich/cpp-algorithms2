@@ -1,10 +1,20 @@
 // https://leetcode.com/problems/height-of-binary-tree-after-subtree-removal-queries/description
 #include <iostream>
-#include <sstream>
 #include <vector>
-#include <bitset>
+#include <unordered_map>
 
 using namespace std;
+
+struct TreeCacheNode {
+    int height;
+    int level;
+    int parent;
+    int val = 0;
+    int other = 0;
+    TreeCacheNode(int x) : height(x) {}
+    TreeCacheNode(int x, int l, int p, int v, int o) : height(x), level(l), parent(p), val(v), other(o) {}
+    TreeCacheNode() {}
+};
 
 struct TreeNode {
     int val;
@@ -46,8 +56,41 @@ public:
         outputTree(pTn -> right, 'r', level + 1);
     }
 
-    vector<int> treeQueries(TreeNode* root, vector<int>& queries) {
-        vector<int> res = {1};
+    static TreeCacheNode calcTreeCache(const TreeNode* pT, unordered_map<int, TreeCacheNode>& cache, int level, int parent) {
+        if (pT == nullptr) return TreeCacheNode(-1);
+
+        int curVal = pT->val;
+        if (curVal == 0) return TreeCacheNode(-1);
+
+        TreeCacheNode leftCache = calcTreeCache(pT -> left, cache, level + 1, curVal);
+        TreeCacheNode rightCache = calcTreeCache(pT -> right, cache, level + 1, curVal);
+        if (leftCache.val !=0) cache[leftCache.val].other = rightCache.val;
+        if (rightCache.val != 0) cache[rightCache.val].other = leftCache.val;
+
+        int curHeight = max(leftCache.height, rightCache.height) +1;
+        TreeCacheNode curCache = TreeCacheNode(curHeight, level, parent, curVal, 0);
+        cache[curVal] = curCache;
+
+        return curCache;
+    }
+
+    vector<int> treeQueries(TreeNode* pRoot, vector<int>& queries) {
+        vector<int> res;
+
+        unordered_map<int, TreeCacheNode> cache;
+        Solution::calcTreeCache(pRoot, cache, 0, -1);
+        for (auto x : cache)
+            cout << x.first << ": " << x.second.height << " " << x.second.level << " " << x.second.parent << " : " << x.second.val << " " << x.second.other << endl;
+        
+        // int wholeHeight = cache[pRoot->val].height;
+        // for (int& i: queries) {
+        //     TreeCacheNode tc = cache[i];
+        //     int qHeight = tc.height;
+        //     int otherHeight = tc.other == 0 ? 0 : cache[tc.other].height;
+        //     int newHeight = tc.level + otherHeight;
+        //     while 
+        // }
+
         return res;
     }
 };
@@ -66,7 +109,7 @@ int main()
     vector<int> queries = { 4 };
 
     vector<int> res = s.treeQueries(pRootNode, queries);
-
-    cout << "res: " << "TODO" << endl;
+    for (int& i: res)
+        std::cout << i << ' ';
     return 0;
 }
