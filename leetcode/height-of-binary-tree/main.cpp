@@ -6,11 +6,12 @@
 using namespace std;
 
 struct TreeCacheNode {
-    int height;
+    int height = 0;
     int level;
     int parent;
     int val = 0;
     int other = 0;
+    int result = -1;
     TreeCacheNode(int x) : height(x) {}
     TreeCacheNode(int x, int l, int p, int v, int o) : height(x), level(l), parent(p), val(v), other(o) {}
     TreeCacheNode() {}
@@ -72,6 +73,48 @@ public:
         cache[curVal] = curCache;
 
         return curCache;
+    }
+
+    static void preCalcResults(const TreeNode* pT, unordered_map<int, TreeCacheNode>& cache, 
+        int alternativeHeight, int shortBranch) {
+        if (pT == nullptr) return;
+
+        int curVal = pT -> val;
+        if (curVal == 0) return;
+
+        TreeCacheNode* pCurCache = &cache[curVal];
+        if (shortBranch) {
+            pCurCache -> result = alternativeHeight;
+            preCalcResults(pT->left, cache, alternativeHeight, true);
+            preCalcResults(pT->right, cache, alternativeHeight, true);
+            return;
+        }
+
+        pCurCache -> result = alternativeHeight;
+        int curHeight = pCurCache -> height + pCurCache -> level;
+        pCurCache -> result = alternativeHeight;
+        TreeNode* pLeft = pT -> left;
+        int leftHeight = pLeft != nullptr ? cache[pLeft->val].height : 0;
+        TreeNode* pRight = pT -> right;
+        int rightHeight = pRight != nullptr ? cache[pRight->val].height : 0;
+        if (leftHeight==rightHeight) {
+            preCalcResults(pLeft, cache, curHeight, true);
+            preCalcResults(pRight, cache, curHeight, true);
+            return;
+        }
+
+        TreeNode* pMaxElement = nullptr;
+        TreeNode* pMinElement = nullptr;
+        if (leftHeight>rightHeight) {
+            pMaxElement = pLeft;
+            pMinElement = pRight;
+        } else if (rightHeight>leftHeight) {
+            pMaxElement = pRight;
+            pMinElement = pLeft;
+        }
+        preCalcResults(pMinElement, cache, curHeight, true);
+        int alternativeHeight2 = cache[pMinElement->val].height + cache[pMinElement->val].level;
+        preCalcResults(pMinElement, cache, max(alternativeHeight, alternativeHeight2), false);
     }
 
     vector<int> treeQueries(TreeNode* pRoot, vector<int>& queries) {
