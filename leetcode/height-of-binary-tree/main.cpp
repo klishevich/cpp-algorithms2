@@ -6,16 +6,14 @@
 using namespace std;
 
 struct TreeCacheNode {
-    int height = 0;
+    int height = -1;
     int level;
-    int parent;
-    int val = 0;
-    int other = 0;
     int result = -1;
-    TreeCacheNode(int x) : height(x) {}
-    TreeCacheNode(int x, int l, int p, int v, int o) : height(x), level(l), parent(p), val(v), other(o) {}
+    TreeCacheNode(int h, int l) : height(h), level(l) {}
     TreeCacheNode() {}
 };
+
+typedef unordered_map<int, TreeCacheNode> type_cache;
 
 struct TreeNode {
     int val;
@@ -57,42 +55,39 @@ public:
         outputTree(pTn -> right, 'r', level + 1);
     }
 
-    static TreeCacheNode calcTreeCache(const TreeNode* pT, unordered_map<int, TreeCacheNode>& cache, int level, int parent) {
-        if (pT == nullptr) return TreeCacheNode(-1);
+    static TreeCacheNode calcTreeCache(const TreeNode* pT, type_cache& cache, int level) {
+        if (pT == nullptr) return TreeCacheNode();
 
         int curVal = pT->val;
-        if (curVal == 0) return TreeCacheNode(-1);
+        if (curVal == 0) return TreeCacheNode();
 
-        TreeCacheNode leftCache = calcTreeCache(pT -> left, cache, level + 1, curVal);
-        TreeCacheNode rightCache = calcTreeCache(pT -> right, cache, level + 1, curVal);
-        if (leftCache.val !=0) cache[leftCache.val].other = rightCache.val;
-        if (rightCache.val != 0) cache[rightCache.val].other = leftCache.val;
+        TreeCacheNode leftCache = calcTreeCache(pT -> left, cache, level + 1);
+        TreeCacheNode rightCache = calcTreeCache(pT -> right, cache, level + 1);
 
-        int curHeight = max(leftCache.height, rightCache.height) +1;
-        TreeCacheNode curCache = TreeCacheNode(curHeight, level, parent, curVal, 0);
+        int curHeight = max(leftCache.height, rightCache.height) + 1;
+        TreeCacheNode curCache = TreeCacheNode(curHeight, level);
         cache[curVal] = curCache;
 
         return curCache;
     }
 
-    static void preCalcResults(const TreeNode* pT, unordered_map<int, TreeCacheNode>& cache, 
-        int alternativeHeight, int shortBranch) {
+    static void preCalcResults(const TreeNode* pT, type_cache& cache, int alternativeHeight, int shortBranch) {
         if (pT == nullptr) return;
 
         int curVal = pT -> val;
         if (curVal == 0) return;
 
         TreeCacheNode* pCurCache = &cache[curVal];
+        cout << curVal << ": " << "altH " << alternativeHeight << endl; 
+        pCurCache -> result = alternativeHeight;
+
         if (shortBranch) {
-            pCurCache -> result = alternativeHeight;
             preCalcResults(pT->left, cache, alternativeHeight, true);
             preCalcResults(pT->right, cache, alternativeHeight, true);
             return;
         }
 
-        pCurCache -> result = alternativeHeight;
         int curHeight = pCurCache -> height + pCurCache -> level;
-        pCurCache -> result = alternativeHeight;
         TreeNode* pLeft = pT -> left;
         int leftHeight = pLeft != nullptr ? cache[pLeft->val].height : 0;
         TreeNode* pRight = pT -> right;
@@ -114,27 +109,7 @@ public:
         }
         preCalcResults(pMinElement, cache, curHeight, true);
         int alternativeHeight2 = cache[pMinElement->val].height + cache[pMinElement->val].level;
-        preCalcResults(pMinElement, cache, max(alternativeHeight, alternativeHeight2), false);
-    }
-
-    vector<int> treeQueries(TreeNode* pRoot, vector<int>& queries) {
-        vector<int> res;
-
-        unordered_map<int, TreeCacheNode> cache;
-        Solution::calcTreeCache(pRoot, cache, 0, -1);
-        for (auto x : cache)
-            cout << x.first << ": " << x.second.height << " " << x.second.level << " " << x.second.parent << " : " << x.second.val << " " << x.second.other << endl;
-        
-        // int wholeHeight = cache[pRoot->val].height;
-        // for (int& i: queries) {
-        //     TreeCacheNode tc = cache[i];
-        //     int qHeight = tc.height;
-        //     int otherHeight = tc.other == 0 ? 0 : cache[tc.other].height;
-        //     int newHeight = tc.level + otherHeight;
-        //     while 
-        // }
-
-        return res;
+        preCalcResults(pMaxElement, cache, max(alternativeHeight, alternativeHeight2), false);
     }
 };
 
@@ -143,16 +118,26 @@ int main()
     Solution s;
 
     // vector<int> input{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 };
-    vector<int> input = { 1,3,4,2,0,6,5,0,0,0, 0, 0, 0, 0, 7 };
+    // vector<int> input = { 1,3,4,2,0,6,5,0,0,0, 0, 0, 0, 0, 7 };
+    vector<int> input = { 5,8,9,2,1,3,7,4,6,0,0,0,0,0,0 };
     
     TreeNode* pRootNode = new TreeNode(input[0]);
     Solution::fillTreeNode(input, 0, pRootNode);
+    cout << "---tree--" << endl;
     Solution::outputTree(pRootNode, 's', 0);
+    type_cache cache;
+    Solution::calcTreeCache(pRootNode, cache, 0);
+    cout << "---cache---" << endl;
+    for (auto x : cache)
+        cout << x.first << ": " << x.second.level << " " << x.second.height << " " << endl;
+    cout << "---calc results---" << endl;
+    Solution::preCalcResults(pRootNode, cache, 0, false);
 
-    vector<int> queries = { 4 };
+    // vector<int> queries = { 4 };
+    vector<int> queries = { 3, 2, 4, 8 };
 
-    vector<int> res = s.treeQueries(pRootNode, queries);
-    for (int& i: res)
-        std::cout << i << ' ';
+    cout << "---result---" << endl;
+    for (int& i: queries)
+        std::cout << i << ": " << cache[i].result << endl;
     return 0;
 }
