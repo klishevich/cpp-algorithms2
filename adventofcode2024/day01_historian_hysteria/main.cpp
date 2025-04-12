@@ -52,7 +52,7 @@ int main()
         res += (vec1[i] * vec2_map[vec1[i]]);
     }
 
-    cout << res << endl;
+    cout << "!!! " << res << endl;
 
     return 0;
 }
