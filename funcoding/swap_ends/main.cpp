@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
     sec.create(10);
     sec.display();
 
-    sec.swapEnds(3);
+    sec.swapEnds(5);
     sec.display();
 
     return 0;
